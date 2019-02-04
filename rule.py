@@ -11,28 +11,71 @@ def look_init():
 	for i in range(13):
 		looked.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
 class board:
-	grid=[]
-	nowturn=0
 	def __init__(self):
+		self.grid=[]
+		self.nowturn=1
+		self.pregrid=[]
+		self.precolor=0
 		for i in range(13):
 			self.grid.append([])
 			for j in range(13):
 				self.grid[i].append(0)
-	def dump(self):
-		a='   0 1 2 3 4 5 6 7 8 9101112\n'
-		for x in range(13):
-			if(len(str(x))==1):
-				a+=' '+str(x)
-			else:
-				a+=str(x)
-			for y in range(13):
-				if self.grid[x][y]==0:
-					a=a+textcolor.color+'172'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
-				elif self.grid[x][y]==1:
-					a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
+	def dump(self,tp=0):
+		if tp:
+			a='   0 1 2 3 4 5 6 7 8 9101112\n'
+			for x in range(13):
+				if(len(str(x))==1):
+					a+=' '+str(x)
 				else:
-					a=a+textcolor.color+'255'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
-			a=a+'\n'
+					a+=str(x)
+				for y in range(13):
+					if self.grid[x][y]==0:
+						if x==3 or x==9:
+							if y==3 or y==9:
+								a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25CE '+textcolor.reset
+								continue
+						if x==6 and y==6:
+							a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25CE '+textcolor.reset
+							continue
+						a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+'  '+textcolor.reset
+					elif self.grid[x][y]==1:
+						a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
+					else:
+						a=a+textcolor.color+'255'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
+				a=a+'\n'
+		else:
+			a='    0 1 2 3 4 5 6 7 8 9101112\n'
+			a+=u'  \u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n'
+			for x in range(13):
+				if(len(str(x))==1):
+					a+=' '+str(x)
+				else:
+					a+=str(x)
+				a=a+u'\u2503'
+				for y in range(13):
+					if y==0:
+						a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+' '+textcolor.reset
+					if self.grid[x][y]==0:
+						if x==3 or x==9:
+							if y==3 or y==9:
+								a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+'+ '+textcolor.reset
+								continue
+						if x==6 and y==6:
+							a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+'+ '+textcolor.reset
+							continue
+						a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+'. '+textcolor.reset
+					elif self.grid[x][y]==1:
+						a=a+textcolor.color+'16'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
+					else:
+						a=a+textcolor.color+'255'+textcolor.end+textcolor.bg+'172'+textcolor.end+u'\u25cf '+textcolor.reset
+				a=a+u'\u2503'
+				if(len(str(x))==1):
+					a+=' '+str(x)
+				else:
+					a+=str(x)
+				a+='\n'
+			a+=u'  \u2517\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u251B\n'
+			a+='    0 1 2 3 4 5 6 7 8 9101112\n'
 		print (u'{}'.format(a))
 	def area(self,x,y,guess):
 		if looked[x][y]==1:
@@ -84,7 +127,7 @@ class board:
 			return 1
 		else:
 			return 0
-	def ifbreathe(self,x,y,color):#Before using this function, you have set where you want test to be looked.
+	def ifbreathe(self,x,y,color):#Before using this function, you have to look_init().
 		if(self.grid[x][y]==0 and looked[x][y]==0):
 			return 1
 		looked[x][y]=1
@@ -98,4 +141,27 @@ class board:
 			if self.ifbreathe(tx,ty,color):
 				return 1
 		return 0
+	def play(self,x,y,color):
+		look_init()
+		if not self.ifbreathe(x,y,color):
+			return
+		self.grid[x][y]=color
+		for i in step:
+			look_init()
+			if x+i[0]>=0 and y+i[1]>=0 and x+i[0]<13 and y+i[1]<13 and self.grid[x+i[0]][y+i[1]]==(not(color-1))+1 and not self.ifbreathe(x+i[0],y+i[1],(not(color-1))+1):
+				self.zero(x+i[0],y+i[1],(not(color-1))+1)
+	def zero(self,x,y,color):
+		self.grid[x][y]=0
+		for i in step:
+			tx=x+i[0]
+			ty=y+i[1]
+			if self.grid[tx][ty]==color:
+				self.zero(tx,ty,color)
+	def superko(self):
+		return
 a=board()
+a.play(1,1,1)
+a.play(2,2,2)
+a.play(3,3,1)
+a.dump(1)
+a.dump(0)
