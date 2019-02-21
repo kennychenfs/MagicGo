@@ -4,18 +4,18 @@ class board:
 	color="\x1b[38;5;"
 	end  ="m"
 	reset="\x1b[0m"
-	def __init__(self):
+	def __init__(self,komi):
 		self.looked=[]
 		self.grid=[]
-		self.nowturn=1
 		self.pregrid=[]
-		self.look_init()
 		self.keepeat=0
 		self.step=[[1,0],[-1,0],[0,1],[0,-1]]
+		self.komi=komi
 		for i in range(13):
 			self.grid.append([])
 			for j in range(13):
 				self.grid[i].append(0)
+		self.look_init()
 	def look_init(self):
 		self.looked=[]
 		for i in range(13):
@@ -78,9 +78,9 @@ class board:
 			a+='    0 1 2 3 4 5 6 7 8 9101112\n'
 		print (u'{}'.format(a))
 	def area(self,x,y,guess):
-		if looked[x][y]==1:
+		if self.looked[x][y]==1:
 			return guess
-		looked[x][y]=1
+		self.looked[x][y]=1
 		if self.grid[x][y]!=0:
 			return self.grid[x][y]
 		for i in self.step:
@@ -105,7 +105,7 @@ class board:
 		for x in range(13):
 			for y in range(13):
 				if self.grid[x][y]==0:
-					look_init()
+					self.look_init()
 					c=self.area(x,y,None)
 					if c==0 or c==None:
 						continue
@@ -120,13 +120,7 @@ class board:
 					b+=1
 				elif self.grid[x][y]==2:
 					w+=1
-		w+=6.5
-		if(w>b):
-			return 2
-		elif(b>w):
-			return 1
-		else:
-			return 0
+		return b-w
 	def breathe(self,x,y,color):
 		if(self.grid[x][y]==0 and self.looked[x][y]==0):
 			return 1
@@ -154,15 +148,13 @@ class board:
 		if b:
 			self.grid[x][y]=0
 		return a
-	def play(self,x,y,color,db=0):
+	def play(self,x,y,color):
 		tmpboard=deepcopy(self)
 		self.grid[x][y]=color
 		ifeat=0
 		for i in self.step:
 			if x+i[0]>=0 and y+i[1]>=0 and x+i[0]<13 and y+i[1]<13 and self.grid[x+i[0]][y+i[1]]==(not(color-1))+1 and not self.ifbreathe(x+i[0],y+i[1],(not(color-1))+1):
 				self.zero(x+i[0],y+i[1],(not(color-1))+1)
-				if db:
-					print 'eat'
 				ifeat=1
 				self.keepeat=1
 		if not ifeat:
