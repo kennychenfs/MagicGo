@@ -48,15 +48,24 @@ class tree:
 		self.y[i]=13
 		self.color[i]=None
 		self.on[i]=nowlocal
+		self.under[nowlocal].append(i)
 		self.under[i]=[]
 		self.used[i]=1
 		self.win[i]=getf(board,(not(turn-1))+1)-board.komi
-	def search(self,getf,board,inl):#inl is input local, the list index
+		self.times[i]+=1
+	def search(self,getf,board,inl,d=0):#inl is input local, the list index
 		nowlocal=inl
 		while self.under[nowlocal]!=[]:
 			for i in self.under[nowlocal]:
 				qu=[]#q+u
-				qu.append(self.win[i]/self.times[i]+self.times[i]/self.times[nowlocal]*0.4)#The lastest numder is c_puct
+				if self.times[i]==0:
+					print i
+				qu.append(self.win[i]/self.times[i]+self.times[nowlocal]/self.times[i]*0.4)#The lastest numder is c_puct
+				if d:
+					print self.times[i]
+			if d:
+				print qu
+				print len(qu)
 			nowlocal=self.under[nowlocal][qu.index(max(qu))]
 			if(self.x[nowlocal]!=13):#if this node isn't pass
 				board.play(self.x[nowlocal],self.y[nowlocal],self.color[nowlocal])
@@ -68,18 +77,11 @@ class tree:
 				self.win[nowlocal]+=self.win[i]
 				self.times[nowlocal]+=self.times[i]
 			nowlocal=self.on[nowlocal]
+ti=0
 t=tree()
 b=board(6.5)
 t.appendnode()
+t.used[0]=1
 t.color[0]=2
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-t.search(lambda x,y:7.5 if y==1 else -7.5,b,0)
-print t.color
+for i in range(100):
+	t.search(lambda x,y:7.5,b,0)

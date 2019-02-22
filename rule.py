@@ -166,7 +166,7 @@ class board:
 		for i in self.step:
 			tx=x+i[0]
 			ty=y+i[1]
-			if self.grid[tx][ty]==color:
+			if tx>=0 and ty>=0 and tx<13 and ty<13 and self.grid[tx][ty]==color:
 				self.zero(tx,ty,color)
 	def ok(self,x,y,color):
 		if self.grid[x][y]!=0:
