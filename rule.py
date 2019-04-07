@@ -20,62 +20,39 @@ class board:
 		self.looked=[]
 		for i in range(13):
 			self.looked.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
-	def dump(self,tp=0):
-		if tp:
-			a='   0 1 2 3 4 5 6 7 8 9101112\n'
-			for x in range(13):
-				if(len(str(x))==1):
-					a+=' '+str(x)
-				else:
-					a+=str(x)
-				for y in range(13):
-					if self.grid[x][y]==0:
-						if x==3 or x==9:
-							if y==3 or y==9:
-								a=a+self.color+'16'+self.end+self.bg+'172'+self.end+u'\u25CE '+self.reset
-								continue
-						if x==6 and y==6:
-							a=a+self.color+'16'+self.end+self.bg+'172'+self.end+u'\u25CE '+self.reset
-							continue
-						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'  '+self.reset
-					elif self.grid[x][y]==1:
-						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
-					else:
-						a=a+self.color+'255'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
-				a=a+'\n'
-		else:
-			a='    0 1 2 3 4 5 6 7 8 9101112\n'
-			a+=u'  \u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n'
-			for x in range(13):
-				if(len(str(x))==1):
-					a+=' '+str(x)
-				else:
-					a+=str(x)
-				a=a+u'\u2503'
-				for y in range(13):
-					if y==0:
-						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+' '+self.reset
-					if self.grid[x][y]==0:
-						if x==3 or x==9:
-							if y==3 or y==9:
-								a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'+ '+self.reset
-								continue
-						if x==6 and y==6:
+	def dump(self):
+		a='    0 1 2 3 4 5 6 7 8 9101112\n'
+		a+=u'  \u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n'
+		for x in range(13):
+			if(len(str(x))==1):
+				a+=' '+str(x)
+			else:
+				a+=str(x)
+			a=a+u'\u2503'
+			for y in range(13):
+				if y==0:
+					a=a+self.color+'16'+self.end+self.bg+'172'+self.end+' '+self.reset
+				if self.grid[x][y]==0:
+					if x==3 or x==9:
+						if y==3 or y==9:
 							a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'+ '+self.reset
 							continue
-						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'. '+self.reset
-					elif self.grid[x][y]==1:
-						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
-					else:
-						a=a+self.color+'255'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
-				a=a+u'\u2503'
-				if(len(str(x))==1):
-					a+=' '+str(x)
+					if x==6 and y==6:
+						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'+ '+self.reset
+						continue
+					a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'. '+self.reset
+				elif self.grid[x][y]==1:
+					a=a+self.color+'16'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
 				else:
-					a+=str(x)
-				a+='\n'
-			a+=u'  \u2517\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u251B\n'
-			a+='    0 1 2 3 4 5 6 7 8 9101112\n'
+					a=a+self.color+'255'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
+			a=a+u'\u2503'
+			if(len(str(x))==1):
+				a+=' '+str(x)
+			else:
+				a+=str(x)
+			a+='\n'
+		a+=u'  \u2517\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u251B\n'
+		a+='    0 1 2 3 4 5 6 7 8 9101112\n'
 		print (u'{}'.format(a))
 	def area(self,x,y,guess):
 		if self.looked[x][y]==1:
@@ -141,7 +118,7 @@ class board:
 			self.grid[x][y]=color
 			b=1
 		elif self.grid[x][y]==(not(color-1))+1:
-			print 'ifbreathe error'
+			print('ifbreathe error')
 			return 0
 		self.look_init()
 		a=self.breathe(x,y,color)
@@ -149,7 +126,9 @@ class board:
 			self.grid[x][y]=0
 		return a
 	def play(self,x,y,color):
-		tmpboard=deepcopy(self)
+		if color==0 or x==13:
+			return
+		tmpboard=deepcopy(self.grid)
 		self.grid[x][y]=color
 		ifeat=0
 		for i in self.step:
@@ -160,7 +139,7 @@ class board:
 		if not ifeat:
 			self.pregrid=[]
 		if ifeat:
-			self.pregrid.append(tmpboard.grid)
+			self.pregrid.append(tmpboard)
 	def zero(self,x,y,color):
 		self.grid[x][y]=0
 		for i in self.step:

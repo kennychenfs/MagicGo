@@ -2,12 +2,12 @@ from keras.layers import Input,Dense,Dropout,Flatten,Conv2D,MaxPooling2D,merge,B
 from keras.models import Model
 import numpy
 inputs=Input(shape=(13,13,4))
-mainmodel=Conv2D(192,kernel_size=(3,3),padding='same')(inputs)
+mainmodel=Conv2D(8,kernel_size=(3,3),padding='same')(inputs)
 mainmodel=BatchNormalization(axis=3)(mainmodel)
 mainmodel=Activation('relu')(mainmodel)
-for _ in range(15):
-	cnn_1=Conv2D(192,kernel_size=(3,3),padding='same')
-	cnn_2=Conv2D(192,kernel_size=(3,3),padding='same')
+for _ in range(2):
+	cnn_1=Conv2D(8,kernel_size=(3,3),padding='same')
+	cnn_2=Conv2D(8,kernel_size=(3,3),padding='same')
 	bn_1=BatchNormalization(axis=3)
 	bn_2=BatchNormalization(axis=3)
 	relu=Activation('relu')
@@ -20,7 +20,7 @@ p=Dense(13*13+1,activation="softmax",kernel_initializer='random_uniform',bias_in
 
 v=Activation('relu')(BatchNormalization(axis=3)(Conv2D(1,(1,1),padding='same')(mainmodel)))
 v=Flatten()(v)
-v=Dense(192,activation='relu',kernel_initializer='random_uniform',bias_initializer='ones')(v)
+v=Dense(8,activation='relu',kernel_initializer='random_uniform',bias_initializer='ones')(v)
 v=Dense(1,kernel_initializer='random_uniform',bias_initializer='ones')(v)
 v=Activation('tanh',name='value_head')(v)
 
