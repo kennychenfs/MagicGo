@@ -148,6 +148,9 @@ class board:
 			if tx>=0 and ty>=0 and tx<13 and ty<13 and self.grid[tx][ty]==color:
 				self.zero(tx,ty,color)
 	def ok(self,x,y,color):
+		if x>=13 or y>=13 or x<0 or y<0:
+		#	print 'pass at rule.py'
+			return 1#out of the board means pass
 		if self.grid[x][y]!=0:
 			return 0
 		if self.ifbreathe(x,y,color):
