@@ -20,7 +20,8 @@ class board:
 		self.looked=[]
 		for i in range(13):
 			self.looked.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
-	def dump(self):
+	def dump(self,tx=13,ty=13):
+		black='16';white='255';none='172'
 		a='    0 1 2 3 4 5 6 7 8 9101112\n'
 		a+=u'  \u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n'
 		for x in range(13):
@@ -31,20 +32,24 @@ class board:
 			a=a+u'\u2503'
 			for y in range(13):
 				if y==0:
-					a=a+self.color+'16'+self.end+self.bg+'172'+self.end+' '+self.reset
+					a=a+self.color+black+self.end+self.bg+none+self.end+' '+self.reset
+				if x is tx and y is ty:
+					black='196';white='201'
+				else:
+					black='16';white='255'
 				if self.grid[x][y]==0:
 					if x==3 or x==9:
 						if y==3 or y==9:
-							a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'+ '+self.reset
+							a=a+self.color+black+self.end+self.bg+none+self.end+'+ '+self.reset
 							continue
 					if x==6 and y==6:
-						a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'+ '+self.reset
+						a=a+self.color+black+self.end+self.bg+none+self.end+'+ '+self.reset
 						continue
-					a=a+self.color+'16'+self.end+self.bg+'172'+self.end+'. '+self.reset
+					a=a+self.color+black+self.end+self.bg+none+self.end+'. '+self.reset
 				elif self.grid[x][y]==1:
-					a=a+self.color+'16'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
+					a=a+self.color+black+self.end+self.bg+none+self.end+u'\u25cf '+self.reset
 				else:
-					a=a+self.color+'255'+self.end+self.bg+'172'+self.end+u'\u25cf '+self.reset
+					a=a+self.color+white+self.end+self.bg+none+self.end+u'\u25cf '+self.reset
 			a=a+u'\u2503'
 			if(len(str(x))==1):
 				a+=' '+str(x)
@@ -88,8 +93,7 @@ class board:
 						continue
 					else:
 						self.fill(x,y,c)
-		self.dump()
-		w=0.0
+		w=self.komi
 		b=0
 		for x in range(13):
 			for y in range(13):
@@ -126,7 +130,7 @@ class board:
 			self.grid[x][y]=0
 		return a
 	def play(self,x,y,color):
-		if color==0 or x==13:
+		if color==0 or x>=13 or x<0 or y>=13 or y<0:
 			return
 		tmpboard=deepcopy(self.grid)
 		self.grid[x][y]=color
@@ -165,5 +169,7 @@ class board:
 		if a:
 			for i in self.pregrid:
 				if tmpboard.grid==i:
+				#	print 'see line 168 in rule.py',tmpboard.grid,i
 					return 0
-		return a
+			return 1
+		return 0
