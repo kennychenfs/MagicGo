@@ -7,14 +7,10 @@ class board:
 	def __init__(self,komi):
 		self.looked=[]
 		self.grid=[]
-		self.pregrid=[]
-		self.keepeat=0
 		self.step=[[1,0],[-1,0],[0,1],[0,-1]]
 		self.komi=komi
 		for i in range(13):
-			self.grid.append([])
-			for j in range(13):
-				self.grid[i].append(0)
+			self.grid.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
 		self.look_init()
 	def look_init(self):
 		self.looked=[]
@@ -37,7 +33,11 @@ class board:
 					black='196';white='201'
 				else:
 					black='16';white='255'
-				if self.grid[x][y]==0:
+				if self.grid[x][y]==1:
+					a=a+self.color+black+self.end+self.bg+none+self.end+u'\u25cf '+self.reset
+				elif self.grid[x][y]==2:
+					a=a+self.color+white+self.end+self.bg+none+self.end+u'\u25cf '+self.reset
+				elif self.grid[x][y]==0:
 					if x==3 or x==9:
 						if y==3 or y==9:
 							a=a+self.color+black+self.end+self.bg+none+self.end+'+ '+self.reset
@@ -46,10 +46,8 @@ class board:
 						a=a+self.color+black+self.end+self.bg+none+self.end+'+ '+self.reset
 						continue
 					a=a+self.color+black+self.end+self.bg+none+self.end+'. '+self.reset
-				elif self.grid[x][y]==1:
-					a=a+self.color+black+self.end+self.bg+none+self.end+u'\u25cf '+self.reset
 				else:
-					a=a+self.color+white+self.end+self.bg+none+self.end+u'\u25cf '+self.reset
+					a=a+str(self.grid[x][y])+' '
 			a=a+u'\u2503'
 			if(len(str(x))==1):
 				a+=' '+str(x)
@@ -81,8 +79,10 @@ class board:
 	def fill(self,x,y,color):
 		self.grid[x][y]=color
 		for i in self.step:
-			if x+i[0]<13 and x+i[0]>=0 and y+i[1]<13 and y+i[1]>=0 and self.grid[x+i[0]][y+i[1]]==0:
-				self.fill(x+i[0],y+i[1],color)
+			tx=x+i[0]
+			ty=y+i[1]
+			if tx>=0 and ty>=0 and tx<13 and ty<13 and self.grid[tx][ty]==0:
+				self.fill(tx,ty,color)
 	def final(self):
 		for x in range(13):
 			for y in range(13):
@@ -130,27 +130,40 @@ class board:
 			self.grid[x][y]=0
 		return a
 	def play(self,x,y,color):
-		if color==0 or x>=13 or x<0 or y>=13 or y<0:
-			return
+		if x>=13 or x<0 or y>=13 or y<0:
+			return#cause this means pass
 		tmpboard=deepcopy(self.grid)
 		self.grid[x][y]=color
-		ifeat=0
+		eatdirections=0
+		ifnotoverone=0
+		eatwhichone=[13,13]
 		for i in self.step:
-			if x+i[0]>=0 and y+i[1]>=0 and x+i[0]<13 and y+i[1]<13 and self.grid[x+i[0]][y+i[1]]==(not(color-1))+1 and not self.ifbreathe(x+i[0],y+i[1],(not(color-1))+1):
-				self.zero(x+i[0],y+i[1],(not(color-1))+1)
-				ifeat=1
-				self.keepeat=1
-		if not ifeat:
-			self.pregrid=[]
-		if ifeat:
-			self.pregrid.append(tmpboard)
+			tx=x+i[0]
+			ty=y+i[1]
+			if tx>=0 and ty>=0 and tx<13 and ty<13 and self.grid[x+i[0]][y+i[1]]==(not(color-1))+1 and (not self.ifbreathe(x+i[0],y+i[1],(not(color-1))+1)):
+				if not self.zero(tx,ty,(not(color-1))+1):
+					ifnotoverone=1
+					eatwhichone=[tx,ty]
+				eatdirections+=1
+		i=0
+		while i<169:
+			if self.grid[i/13][i%13]==3:
+				self.grid[i/13][i%13]=0
+			i+=1
+		if ifnotoverone and eatdirections==1:
+			self.grid[eatwhichone[0]][eatwhichone[1]]=3
 	def zero(self,x,y,color):
+		overone=0
 		self.grid[x][y]=0
 		for i in self.step:
 			tx=x+i[0]
 			ty=y+i[1]
 			if tx>=0 and ty>=0 and tx<13 and ty<13 and self.grid[tx][ty]==color:
 				self.zero(tx,ty,color)
+				overone=1
+		if overone:
+			return 1
+		return 0
 	def ok(self,x,y,color):
 		if x>=13 or y>=13 or x<0 or y<0:
 		#	print 'pass at rule.py'
@@ -159,17 +172,12 @@ class board:
 			return 0
 		if self.ifbreathe(x,y,color):
 			return 1
-		tmpboard=deepcopy(self)
-		tmpboard.grid[x][y]=color
-		a=0
+		self.grid[x][y]=color
 		for i in self.step:
-			if x+i[0]>=0 and y+i[1]>=0 and x+i[0]<13 and y+i[1]<13 and tmpboard.grid[x+i[0]][y+i[1]] == (not(color-1))+1 and (not tmpboard.ifbreathe(x+i[0],y+i[1],(not(color-1))+1)):
-				a=1
-				tmpboard.zero(x+i[0],y+i[1],(not(color-1))+1)
-		if a:
-			for i in self.pregrid:
-				if tmpboard.grid==i:
-				#	print 'see line 168 in rule.py',tmpboard.grid,i
-					return 0
-			return 1
+			tx=x+i[0]
+			ty=y+i[1]
+			if tx>=0 and ty>=0 and tx<13 and ty<13 and self.grid[x+i[0]][y+i[1]] == (not(color-1))+1 and (not self.ifbreathe(x+i[0],y+i[1],(not(color-1))+1)):
+				self.grid[x][y]=0
+				return 1
+		self.grid[x][y]=0
 		return 0

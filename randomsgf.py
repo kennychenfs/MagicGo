@@ -1,4 +1,4 @@
-from rule import board
+from rulenew import board
 from random import randint
 import datetime
 import os
