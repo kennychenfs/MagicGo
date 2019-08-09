@@ -132,7 +132,6 @@ class board:
 	def play(self,x,y,color):
 		if x>=13 or x<0 or y>=13 or y<0:
 			return#cause this means pass
-		tmpboard=deepcopy(self.grid)
 		self.grid[x][y]=color
 		eatdirections=0
 		ifnotoverone=0
