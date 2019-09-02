@@ -4,13 +4,14 @@ class board:
 	color="\x1b[38;5;"
 	end  ="m"
 	reset="\x1b[0m"
-	def __init__(self,komi):
+	def __init__(self,komi=6.5,grid=[]):
 		self.looked=[]
-		self.grid=[]
+		self.grid=grid
 		self.step=[[1,0],[-1,0],[0,1],[0,-1]]
 		self.komi=komi
-		for i in range(13):
-			self.grid.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
+		if grid is []:
+			for i in range(13):
+				self.grid.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
 		self.look_init()
 	def look_init(self):
 		self.looked=[]

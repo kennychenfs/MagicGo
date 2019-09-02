@@ -1,6 +1,8 @@
 from keras.layers import Input,Dense,Dropout,Flatten,Conv2D,MaxPooling2D,merge,BatchNormalization,Activation,add,Lambda
 from keras.models import Model
-import numpy
+import numpy as np
+import tensorflow as tf
+'''
 inputs=Input(shape=(13,13,4))
 mainmodel=Conv2D(192,kernel_size=(3,3),padding='same')(inputs)
 mainmodel=BatchNormalization(axis=3)(mainmodel)
@@ -26,6 +28,11 @@ v=Activation('tanh',name='value_head')(v)
 
 model=Model(inputs=inputs,outputs=[p,v])
 model.compile(loss='mse',optimizer='adam')
-print(model.summary())
-model.fit(x=numpy.random.randint(0,2,size=(10000,13,13,4)).astype('float32'),y=[numpy.random.random((10000,170)).astype('float32'),numpy.random.random((10000)).astype('float32')*2-1],epochs=1,verbose=1)
-model.save('first.h5')
+'''
+model = tf.contrib.keras.models.load_model('random.h5')
+for i in range(10):
+	indata=np.load('randomdata/randomdata'+str(i)+'.npy')
+	resultdata=np.load('randomdata/randomdataresult'+str(i)+'.npy')
+	chancedata=np.load('randomdata/randomdatachance'+str(i)+'.npy')
+	model.fit(x=indata.astype('float32'),y=[chancedata.astype('float32'),resultdata.astype('float32')],epochs=1,verbose=1)
+	model.save('random.h5')
