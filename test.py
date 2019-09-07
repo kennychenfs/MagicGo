@@ -10,7 +10,7 @@ def get_residual_block(input):
 	return tf.nn.relu(tf.add(input,bn))
 def resnet_fn(features, labels, mode):
 	#The features must be: <tensor, shape=(batch_size, 13, 13, 4)>
-	#The labels must be: {'policy':<tensor, shape=(batch_size, 170)>, 'value':<tensor, shape=(batch_size, 1)>}
+	#The labels must be: {'policy':<tensor, shape=(batch_size, 170)>, 'value':<tensor, shape=(batch_size)>}
 	#which value is z, and policy is pi in AlphaGo Zero paper
 	#not to reshape as possible because TPU doesn't good at it
 	
@@ -56,24 +56,24 @@ def resnet_fn(features, labels, mode):
 		optimizer=tf.train.MomentumOptimizer(learning_rate=learning_rate, momentum=0.9)#continue here
 		train_op=optimizer.minimize(loss=loss, global_step=global_step)#which global_step is a variable
 		return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
-a=np.random.randint(0, 2, size=(1000, 13, 13, 4)).astype('float32')
-value=np.random.random_sample(size=(1000, 1)).astype('float32')*2-1
-policy=np.random.random_sample(size=(1000, 170)).astype('float32')
+size=30000
+a=np.random.randint(0, 2, size=(size, 13, 13, 4)).astype('float32')
+value=np.random.random_sample(size=(size,1)).astype('float32')*2-1
+policy=np.random.random_sample(size=(size, 170)).astype('float32')
 total=np.sum(policy,axis=1)
-policy=np.asarray([policy[i]/total[i] for i in range(1000)])
-print('\n\n\nfinish data')
+policy=np.asarray([policy[i]/total[i] for i in range(size)])
+b=size//1024
+c=size//b
+a=np.split(a,[i*c for i in range(1,1+b)])
+value=np.split(value,[i*c for i in range(1,1+b)])
+policy=np.split(policy,[i*c for i in range(1,1+b)])
 checkpoint_config = tf.estimator.RunConfig(
-    save_checkpoints_secs = 300,  # Save checkpoints every 20 minutes.
-    keep_checkpoint_max = 5,       # Retain the 10 most recent checkpoints.
+    save_checkpoints_secs = 300,  # Save checkpoints every 5 minutes.
+    keep_checkpoint_max = 5,       # Retain the 5 most recent checkpoints.
 )
 estimator=tf.estimator.Estimator(model_fn=resnet_fn, model_dir="/home/kenny/Desktop/python3/MG/MGmodels",config=checkpoint_config)
-train_input_fn = tf.estimator.inputs.numpy_input_fn(
-    x=a,
-    y={'value':value,'policy':policy},
-    batch_size=100,
-    num_epochs=1,
-    shuffle=True)
-estimator.train(
-    input_fn=train_input_fn,
-    steps=1000
-)
+i=0
+for a_b,policy_b,value_b in zip(a,policy,value):
+	estimator.train(tf.estimator.inputs.numpy_input_fn(x=a_b,y={'policy':policy_b,'value':value_b},num_epochs=1,shuffle=False),steps=1000)
+	i+=1
+	print(i)
